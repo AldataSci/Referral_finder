@@ -1,0 +1,57 @@
+# Referral potential score (0-100): how likely is this lead to be worth a call about home-care referrals?
+#   category points      what kind of facility it is
+# + contact points       how well the best person on file matches the job (see roles.py tiers)
+# + phone points         there is a main phone number to call
+# + email points         an email address is on file for a contact
+# `taxonomies`: NPI taxonomy descriptions to search for. A record is kept only
+# if its PRIMARY taxonomy starts with one of them (verified against the live API).
+fit:
+  categories:
+    skilled_nursing:
+      label: Skilled nursing
+      weight: 50
+      taxonomies: ["Skilled Nursing Facility"]
+    rehab:
+      label: Rehab
+      weight: 45
+      taxonomies: ["Rehabilitation Hospital", "Rehabilitation Unit"]
+    case_management:
+      label: Case management
+      weight: 35
+      taxonomies: ["Case Management"]
+  signals:
+    # points for the best contact's tier: [likely handles referrals, can route you, role unclear, finance/executive]
+    contact_by_tier: [30, 18, 6, 0]
+    has_phone: 10
+    has_email: 10
+  max_score: 100
+  # Highest band whose `min` the score reaches. `style` picks the chip color in the app.
+  bands:
+    - { min: 85, label: Excellent, style: high }
+    - { min: 65, label: Good, style: good }
+    - { min: 55, label: Fair, style: fair }
+    - { min: 0, label: Low, style: low }
+
+# Call logging (lite). Outcomes are shown as one-click buttons, in this order.
+calls:
+  outcomes:
+    reached_decision_maker: "✅ Reached decision maker"
+    transferred: "🔀 Transferred"
+    callback_received: "📞 Callback received"
+    got_name_from_gatekeeper: "📝 Got a name"
+    voicemail_left: "📭 Voicemail left"
+    no_answer: "🔕 No answer"
+    gatekeeper_blocked: "🚧 Gatekeeper blocked"
+    wrong_number: "❌ Wrong number"
+    not_interested: "🚫 Not interested"
+  miss_outcomes: [voicemail_left, no_answer]   # these build the voicemail streak
+  # Any logged call makes a lead "contacted", unless the outcome says otherwise:
+  status_after_outcome:
+    wrong_number: bad_number
+    not_interested: not_a_fit
+  # Hidden from the table unless "Show hidden" is ticked:
+  hidden_statuses: [already_called, not_a_fit, bad_number, unreachable]
+
+# Display settings
+ui:
+  page_size: 10        # lead cards per page

@@ -1,0 +1,78 @@
+# Web contact finder (Nimble Search -> Gemini -> evidence check in code)
+nimble:
+  url: https://sdk.nimbleway.com/v2/search
+  search_depth: standard     # "lite" = snippets only, "standard" = richer content
+  full_content: true         # adds each result's full page text (costs more credits)
+  max_results: 5
+  timeout_seconds: 60
+  retries: 2
+  cache_ttl_days: 30
+  # Directory sites list NPI data, not staff; skip them so the top results are real facility pages.
+  exclude_domains: [npidb.org, health.usnews.com, npino.com, npiprofile.com, profiles.health.ny.gov, yelp.com, caring.com,
+    nursa.com, fastdol.com, propublica.org, nursinghomedatabase.com, assistedlivingmagazine.com, teaandslippers.com,
+    prospeo.io, zoominfo.com, rocketreach.co, apollo.io, indeed.com, glassdoor.com, simplyhired.com, ziprecruiter.com, apploi.com]
+  query_template: '"{name}" {borough} NY admissions phone contact director of social work case management'
+
+gemini:
+  # Tried in order when a model answers 503 "high demand".
+  models: [gemini-3.8-flash, gemini-3.5-flash, gemini-3.1-flash-lite]
+  retries_per_model: 2
+  retry_wait_seconds: 3
+  max_chars_per_page: 6000   # page text beyond this is not sent to the model (smaller = faster)
+
+# How likely a job title is to handle home-care referrals.
+# Regular expressions matched against the lowercase title (\b = word boundary).
+# Checked in this order: referral, unlikely, routing. Anything else is "unclear".
+titles:
+  referral:   # saved as role decision_maker
+    - 'social work'
+    - 'social service'
+    - 'discharge'
+    - 'case manage'
+    - 'care manage'
+    - 'care coordinat'
+    - 'admission'
+    - 'admitting'
+    - 'intake'
+    - 'patient access'
+    - 'patient service'
+    - 'liaison'
+    - 'referral'
+  unlikely:   # never saved from the web; ranked last for NPI registered contacts
+    - '\bc\.?\s?f\.?\s?o\b'
+    - '\bceo\b'
+    - '\bcoo\b'
+    - 'financ'
+    - 'fiscal'
+    - 'controller'
+    - 'comptroller'
+    - 'billing'
+    - 'revenue'
+    - 'receivable'
+    - 'accounting'
+    - 'collection'
+    - 'treasurer'
+    - 'payroll'
+    - 'president'
+    - '\bvp\b'
+    - '\bv\.p\.'
+    - 'chief '
+    - 'officer'
+    - 'chairman'
+    - 'owner'
+    - 'member'
+    - 'partner'
+    - 'secretary'
+    - 'recruit'
+    - 'staffing'
+    - 'benefits'
+    - 'legal'
+    - 'counsel'
+  routing:    # can tell you who handles referrals
+    - 'administrat'
+    - '\badm\b'
+    - 'asst\. adm'
+    - 'director'
+    - 'manager'
+    - 'supervisor'
+    - 'coordinator'

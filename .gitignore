@@ -15,3 +15,10 @@ venv/
 .vscode/
 .idea/
 .DS_Store
+
+# App data
+data/*.db
+data/cache/*
+!data/cache/.gitkeep
+.streamlit/secrets.toml
+*.egg-info/

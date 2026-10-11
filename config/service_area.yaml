@@ -1,0 +1,21 @@
+# Today: Brooklyn only. ZIP prefixes are matched against the LOCATION ZIP.
+boroughs:
+  Brooklyn:
+    state: NY
+    zip_prefixes: ["112"]
+
+# ZIP search: show leads within this many miles of the ZIP entered (0 = that ZIP only)
+search:
+  radius_options_miles: [0, 1, 2, 3, 5]
+  default_radius_miles: 2
+
+# NPI Registry fetch settings
+npi:
+  base_url: https://npiregistry.cms.hhs.gov/api/
+  version: "2.1"
+  page_size: 200          # API maximum per request
+  max_skip: 1000          # API maximum skip (so at most 1,200 results per query)
+  request_delay_seconds: 0.3
+  timeout_seconds: 30
+  retries: 3
+  cache_ttl_days: 30

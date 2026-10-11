@@ -1,0 +1,12 @@
+streamlit
+sentry-sdk
+python-dotenv
+pytest
+sqlmodel
+psycopg[binary]
+pyyaml
+httpx
+tzdata
+pandas
+google-genai
+zipcodes
