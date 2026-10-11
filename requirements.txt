@@ -10,3 +10,4 @@ tzdata
 pandas
 google-genai
 zipcodes
+-e .
